@@ -1,25 +1,31 @@
 name: CI devops 2025
 
+# Ce workflow se lance automatiquement lors des pushes
+# sur les branches main et develop, ainsi que sur les pull requests
 on:
   push:
     branches:
       - main
       - develop
-
   pull_request:
 
 jobs:
   test-backend:
+
+    # Machine virtuelle utilisée par GitHub Actions
     runs-on: ubuntu-24.04
 
     steps:
+      # Étape 1 : récupérer le code du repository
       - uses: actions/checkout@v4
 
+      # Étape 2 : installer Java 21 nécessaire pour Spring Boot
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
 
+      # Étape 3 : compiler le projet et exécuter tous les tests Maven
       - name: Build and test with Maven
         run: mvn clean verify --file ./backend/pom.xml
