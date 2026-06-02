@@ -1,38 +1,56 @@
 name: CI devops 2025
 
-# Ce workflow se lance automatiquement lors des pushes
-# sur les branches main et develop, ainsi que sur les pull requests
 on:
   push:
-   
-   
-jobs:
-  test-backend:
+    branches:
+      - main
+      - develop
+  pull_request:
 
-    # Machine virtuelle utilisée par GitHub Actions
+jobs:
+
+  test-backend:
     runs-on: ubuntu-24.04
 
     steps:
-      # Étape 1 : récupérer le code du repository
       - uses: actions/checkout@v4
 
-      # Étape 2 : installer Java 21 nécessaire pour Spring Boot
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
 
-      # Étape 3 : compiler le projet et exécuter tous les tests Maven
       - name: Build and test with Maven
         run: mvn clean verify --file ./backend/pom.xml
 
-        build-and-push-docker-image:
-          needs: test-backend
-          runs-on: ubuntu-24.04
+  build-and-push-docker-image:
+    needs: test-backend
+    runs-on: ubuntu-24.04
 
-          steps:
-            - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-            - name: Login to DockerHub
-              run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+      - name: Login to DockerHub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      - name: Build image and push backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-simple-api:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build image and push database
+        uses: docker/build-push-action@v6
+        with:
+          context: ./database
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-database:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build image and push httpd
+        uses: docker/build-push-action@v6
+        with:
+          context: ./httpd
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
