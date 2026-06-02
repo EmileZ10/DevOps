@@ -1,5 +1,0 @@
-spring:
-  datasource:
-    url: jdbc:postgresql://my-postgres:5432/db
-    username: usr
-    password: pwd

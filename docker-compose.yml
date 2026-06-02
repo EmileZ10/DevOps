@@ -1,0 +1,40 @@
+services:
+  backend:
+    build: ./backend          # Construit l'image depuis le dossier backend/
+    networks:
+      - front-network         # Communique avec le httpd
+      - back-network          # Communique avec la database
+    depends_on:
+      - database              # Attend que la database soit démarrée avant de lancer le backend
+    env_file:
+      - .env                  # Charge les variables d'environnement depuis .env  
+    restart: unless-stopped   # Redémarre automatiquement sauf si arrêté manuellement
+ 
+  database:
+    build: ./database         # Construit l'image depuis le dossier database/
+    networks:
+      - back-network          # Uniquement accessible par le backend, isolée du frontend
+    env_file:
+      - .env                  # Credentials PostgreSQL chargés depuis .env
+    volumes:
+      - db-data:/var/lib/postgresql/data   # Persiste les données sur l'hôte
+    restart: unless-stopped
+ 
+  httpd:
+    build: ./httpd         # Construit l'image depuis le dossier httpd/
+    ports:
+      - "80:80"            # Seul service exposé à l'extérieur
+    networks:
+      - front-network      # Communique uniquement avec le backend
+    depends_on:
+      - backend            # Attend que le backend soit démarré
+    env_file:
+      - .env               # Variables pour la config du reverse proxy
+    restart: unless-stopped
+ 
+networks:
+  front-network:           # Réseau httpd <-> backend
+  back-network:            # Réseau backend <-> database, isolé du frontend
+ 
+volumes:
+  db-data:                 # Volume nommé pour persister les données PostgreSQL
