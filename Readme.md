@@ -73,3 +73,79 @@ Sauvegarder les images dans un emplacement accessible même si la machine locale
 Garantir la reproductibilité des déploiements en utilisant exactement la même image sur tous les environnements (développement, test, production).
 
 Docker Hub est un registre public très utilisé, mais les entreprises utilisent souvent des registres privés pour mieux contrôler l'accès à leurs images et protéger leur code.
+
+Q2-1
+
+Les Testcontainers sont des bibliothèques Java qui permettent de lancer des conteneurs Docker automatiquement pendant les tests.
+Dans notre projet, ils servent à démarrer une base de données PostgreSQL temporaire afin de tester l’application dans des conditions proches de la production.
+Cela permet d’avoir des tests d’intégration réalistes sans avoir besoin de configurer manuellement une base de données.
+
+Q2-2
+
+Les variables sécurisées (secrets) sont utilisées pour stocker des informations sensibles comme les identifiants Docker Hub ou les tokens d’accès.
+On les utilise pour éviter de les écrire directement dans le code source ou dans le fichier YAML, car ce fichier est souvent versionné sur GitHub et pourrait être accessible publiquement.
+Cela permet de sécuriser les credentials tout en les utilisant dans le pipeline CI/CD.
+
+Q2-3
+
+Le needs: test-backend permet de créer une dépendance entre les jobs GitHub Actions.
+Cela garantit que le job de build et de push Docker ne s’exécute que si le job de test backend a réussi.
+Sans cela, les images Docker pourraient être construites et publiées même si le code contient des erreurs ou si les tests échouent.
+
+Q2-4
+
+Les images Docker sont poussées vers Docker Hub pour pouvoir être stockées et utilisées à distance.
+Cela permet de :
+Déployer l’application sur n’importe quelle machine sans reconstruire les images
+Partager facilement les images avec une équipe
+Avoir un registre centralisé des versions de l’application
+Automatiser les déploiements dans une logique CI/CD
+Garantir que tous les environnements utilisent exactement la même image
+
+
+Q2-5 (CI vs CD)
+
+La CI (Continuous Integration) consiste à vérifier automatiquement que le code fonctionne correctement.
+Dans notre pipeline, cela correspond à la compilation du projet et à l’exécution des tests Maven (mvn clean verify).
+La CD (Continuous Delivery) consiste à préparer et livrer l’application.
+Dans notre cas, cela correspond à la création des images Docker et leur publication sur Docker Hub.
+La différence principale est que la CI vérifie le code tandis que la CD permet de le livrer sous forme utilisable.
+
+Q2-6 (fonctionnement GitHub Secrets / tokens)
+
+Les tokens Docker Hub sont stockés dans GitHub sous forme de secrets sécurisés.
+Ils ne sont jamais écrits dans le code source.
+Pendant l’exécution du pipeline, GitHub remplace automatiquement :
+
+${{ secrets.DOCKERHUB_USERNAME }}
+${{ secrets.DOCKERHUB_TOKEN }}
+
+par les vraies valeurs stockées de manière sécurisée.
+Le token permet ensuite de se connecter à Docker Hub via la commande docker login sans exposer les identifiants dans le repository.
+
+Q2-7 (fonctionnement global CD)
+
+La partie CD du pipeline fonctionne en plusieurs étapes :
+
+GitHub Actions récupère le code source
+Il se connecte à Docker Hub grâce aux secrets
+Il construit les images Docker à partir des Dockerfiles
+Il pousse ces images sur Docker Hub si le push est effectué sur la branche main
+Cela permet d’automatiser complètement la création et la publication des images Docker après validation du code.
+
+Q2-8 (Pourquoi séparer CI et CD)
+
+Séparer CI et CD permet de mieux organiser le pipeline.
+La CI est rapide et sert uniquement à tester le code.
+La CD est plus lourde car elle implique la construction et la publication des images Docker.
+Cela permet aussi d’éviter de publier une image si les tests ne sont pas passés, ce qui garantit la qualité du code livré.
+
+Q2-9 (Résumé pipeline global)
+
+Le pipeline CI/CD fonctionne de la manière suivante :
+Un push déclenche GitHub Actions
+La CI compile le projet et lance les tests
+Si les tests réussissent, la CD démarre
+Les images Docker sont construites
+Les images sont envoyées sur Docker Hub
+Cela permet d’avoir un processus automatisé de validation et de livraison du code.

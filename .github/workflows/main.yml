@@ -24,6 +24,15 @@ jobs:
       - name: Build and test with Maven
         run: mvn clean verify --file ./backend/pom.xml
 
+      - name: SonarCloud analysis
+            run: |
+              mvn -B verify sonar:sonar \
+                -Dsonar.projectKey=EmileZ10_DevOps \
+                -Dsonar.organization=emilez10 \
+                -Dsonar.host.url=https://sonarcloud.io \
+                -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+                --file ./backend/pom.xml 
+
   build-and-push-docker-image:
     needs: test-backend
     runs-on: ubuntu-24.04
