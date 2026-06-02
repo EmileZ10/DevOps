@@ -29,4 +29,4 @@ jobs:
             -Dsonar.organization=emilez10 \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-            --file ./Part1/TP/backend/pom.xml
+            --file ./backend/pom.xml
