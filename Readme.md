@@ -149,3 +149,21 @@ Si les tests réussissent, la CD démarre
 Les images Docker sont construites
 Les images sont envoyées sur Docker Hub
 Cela permet d’avoir un processus automatisé de validation et de livraison du code.
+
+Q3-1 
+
+Inventaire setup.yml : définit le groupe prod avec le host emile.zanna.takima.school, l'utilisateur admin et le chemin vers la clé SSH privée.
+Commandes utilisées :
+ansible all -i inventories/setup.yml -m ping — vérifie la connectivité
+ansible all -i inventories/setup.yml -m setup -a "filter=ansible_distribution*" — récupère les facts sur l'OS (Debian 12 bookworm)
+ansible all -i inventories/setup.yml -m apt -a "name=apache2 state=absent" --become, supprime Apache2
+
+Q3-2
+
+Le playbook installe Docker en suivant la procédure officielle Debian : installation des dépendances, ajout de la clé GPG et du dépôt Docker, installation de docker-ce, puis création d'un environnement Python virtuel avec le SDK Docker. La dernière tâche vérifie que le service Docker est bien démarré.
+
+Q3-3
+
+database : image PostgreSQL, variables d'env POSTGRES_DB/USER/PASSWORD, connecté au réseau my-network
+backend : image Spring Boot, variables d'env POSTGRES_* pour se connecter à la DB, connecté au réseau my-network
+my-httpd : image Apache httpd, port 80:80 exposé, variables BACKEND_HOST=backend et BACKEND_PORT=8080 pour rediriger vers l'API

@@ -1,0 +1,8 @@
+all:
+  vars:
+    ansible_user: admin
+    ansible_ssh_private_key_file: /home/emile/.ssh/id_rsa
+  children:
+    prod:
+      hosts:
+        emile.zanna.takima.school:
