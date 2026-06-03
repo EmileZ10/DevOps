@@ -170,4 +170,4 @@ my-httpd : image Apache httpd, port 80:80 exposé, variables BACKEND_HOST=backen
 
 Q3-4
 
-Ce n'est pas totalement sûr car n'importe quelle image taguée latest sera déployée en production, même si elle contient un bug ou une faille. Pour sécuriser on peut utiliser des tags de version (v1.0.1) au lieu de latest, et ne déployer que les tags validés. On peut aussi ajouter des tests supplémentaires avant le déploiement, ou une étape de validation manuelle.
+Ce n'est pas totalement sûr car n'importe quelle image taguée latest sera déployée en production, même si elle contient un bug ou une faille. Pour sécuriser on peut utiliser des tags de version (v1.0.1) au lieu de latest, et ne déployer que les tags validés. On peut aussi ajouter des tests supplémentaires avant le déploiement, ou une étape de validation manuelle..
