@@ -3,11 +3,11 @@
     name: my-httpd
     image: emilez10/tp-devops-httpd:latest
     networks:
-      - name: my-network
+      - name: frontend-network
     ports:
       - "80:80"
     env:
-      BACKEND_HOST: "backend"
-      BACKEND_PORT: "8080"
+      BACKEND_HOST: "{{ backend_host }}"
+      BACKEND_PORT: "{{ backend_port }}"
   vars:
     ansible_python_interpreter: /opt/docker_venv/bin/python

@@ -1,5 +1,11 @@
-- name: Create Docker network
+- name: Create frontend network
   community.docker.docker_network:
-    name: my-network
+    name: frontend-network
+  vars:
+    ansible_python_interpreter: /opt/docker_venv/bin/python
+
+- name: Create backend network
+  community.docker.docker_network:
+    name: backend-network
   vars:
     ansible_python_interpreter: /opt/docker_venv/bin/python

@@ -1,0 +1,5 @@
+postgres_db: "db"
+postgres_user: "usr"
+postgres_password: "pwd"
+backend_host: "backend"
+backend_port: "8080"
