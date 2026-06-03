@@ -1,0 +1,8 @@
+- name: Launch front container
+  community.docker.docker_container:
+    name: front
+    image: emilez10/tp-devops-front:latest
+    networks:
+      - name: frontend-network
+  vars:
+    ansible_python_interpreter: /opt/docker_venv/bin/python
