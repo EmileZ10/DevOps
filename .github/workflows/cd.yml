@@ -50,22 +50,3 @@ jobs:
           context: ./httpd
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:latest
           push: true
-  deploy:
-    needs:
-      - push-backend
-      - push-database
-      - push-httpd
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Install Ansible
-        run: pip install ansible
-      - name: Setup SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H emile.zanna.takima.school >> ~/.ssh/known_hosts
-      - name: Run Ansible playbook
-        run: ansible-playbook -i ansible/inventories/setup.yml ansible/playbook.yml
